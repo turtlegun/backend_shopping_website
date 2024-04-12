@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Canvas Text Dragging</title>
+    <style>
+        #canvasContainer {
+            display: flex;
+            justify-content: space-around;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvasContainer">
+        <canvas id="canvas1" width="400" height="200"></canvas>
+        <canvas id="canvas2" width="400" height="200"></canvas>
+    </div>
+    <script>
+        window.onload = function() {
+            const canvas1 = document.getElementById('canvas1');
+            const canvas2 = document.getElementById('canvas2');
+            const ctx1 = canvas1.getContext('2d');
+            const ctx2 = canvas2.getContext('2d');
+            let isDragging = false;
+            let mouseX, mouseY;
+
+            // Function to draw text on both canvases
+            function drawText(x, y, text) {
+                ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+                ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+                ctx1.fillText(text, x, y);
+                ctx2.fillText(text, x, y);
+            }
+
+            // Mouse move event listener
+            canvas1.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    mouseX = e.clientX - canvas1.getBoundingClientRect().left;
+                    mouseY = e.clientY - canvas1.getBoundingClientRect().top;
+                    drawText(mouseX, mouseY, 'Your Text'); // Change 'Your Text' to the text you want to draw
+                }
+            });
+
+            // Mouse down event listener
+            canvas1.addEventListener('mousedown', function(e) {
+                isDragging = true;
+            });
+
+            // Mouse up event listener
+            canvas1.addEventListener('mouseup', function(e) {
+                isDragging = false;
+            });
+
+            // Prevent default behavior to avoid text selection
+            canvas1.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+            });
+
+            // Prevent default behavior to avoid text selection
+            canvas2.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+            });
+
+            // Set font style for both canvases
+            ctx1.font = '20px Arial';
+            ctx2.font = '20px Arial';
+        };
+    </script>
+</body>
+</html>

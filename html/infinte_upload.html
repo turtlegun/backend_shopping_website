@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Image Uploader</title>
+<style>
+  canvas {
+    border: 1px solid #000;
+    margin: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <input type="file" id="imageInput" accept="image/*">
+  <canvas id="imageCanvas" width="800" height="600"></canvas>
+
+  <script>
+    document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+    
+    let images = []; // Array to store images
+    let selectedImage = null; // Reference to the selected image
+    let dragStartX, dragStartY; // Variables to store the starting position of drag
+
+    const canvas = document.getElementById('imageCanvas');
+    const context = canvas.getContext('2d');
+
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mousemove', handleMouseMove);
+
+    function handleImageUpload(event) {
+      const files = event.target.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+          const image = new Image();
+          image.src = event.target.result;
+          image.onload = function() {
+            images.push({ image, x: 0, y: 0 });
+            redrawCanvas();
+          }
+        }
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function redrawCanvas() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      images.forEach(({ image, x, y }) => {
+        context.drawImage(image, x, y);
+      });
+    }
+
+    function handleMouseDown(event) {
+      const mouseX = event.offsetX;
+      const mouseY = event.offsetY;
+
+      for (let i = images.length - 1; i >= 0; i--) {
+        const { x, y, image } = images[i];
+        if (mouseX >= x && mouseX <= x + image.width && mouseY >= y && mouseY <= y + image.height) {
+          selectedImage = images[i];
+          dragStartX = mouseX - x;
+          dragStartY = mouseY - y;
+          break;
+        }
+      }
+    }
+
+    function handleMouseUp() {
+      selectedImage = null;
+    }
+
+    function handleMouseMove(event) {
+      if (selectedImage) {
+        selectedImage.x = event.offsetX - dragStartX;
+        selectedImage.y = event.offsetY - dragStartY;
+        redrawCanvas();
+      }
+    }
+  </script>
+</body>
+</html>
